@@ -24,24 +24,28 @@
     <main>
       <section class="page-intro wrap" aria-labelledby="page-title">
         <p class="overline">FAMILIEARCHIEF / TICHEM</p>
-        <h1 id="page-title">De familie <em>Tichem</em></h1>
-        <p>Een interactieve stamboom van nu tot de zeventiende eeuw.</p>
+        <h1 id="page-title">Familie <span>Tichem</span></h1>
+        <p>Ontdek de generaties en open een kaart voor het verhaal erachter.</p>
       </section>
 
       <section class="tree-section wrap" id="boom" aria-labelledby="tree-title">
         <div class="section-heading">
-          <div><p class="overline">12 GENERATIES</p><h2 id="tree-title">De stamboom</h2></div>
-          <p>Selecteer een persoon om het profiel en de bronnen te bekijken.</p>
+          <div><p class="overline">VAN MADE TOT NU</p><h2 id="tree-title">De stamboom</h2></div>
+          <p>Oudste generatie bovenaan · klik op een persoon</p>
         </div>
         <div class="tree-toolbar">
           <label for="person-search">Zoek</label>
           <div class="search-box"><span aria-hidden="true">⌕</span><input id="person-search" type="search" placeholder="Naam of plaats" autocomplete="off" /></div>
           <button type="button" id="clear-search" class="text-button" hidden>Wissen</button>
         </div>
+        <p id="no-results" class="no-results" hidden>Geen personen gevonden.</p>
         <div class="tree-layout">
           <div class="tree-column">
-            <ol id="person-list" class="person-list" aria-label="Generaties van jong naar oud"></ol>
-            <p id="no-results" class="no-results" hidden>Geen personen gevonden.</p>
+            <div class="tree-key" aria-hidden="true"><span><i class="key-dot ancestor"></i> Tichem-lijn</span><span><i class="key-dot partner"></i> Partner</span><span><i class="key-line"></i> Mogelijke verbinding</span></div>
+            <div id="family-tree" class="family-tree" aria-label="Stamboom van oud naar jong">
+              <svg id="tree-links" class="tree-links" aria-hidden="true"></svg>
+              <div id="tree-generations" class="tree-generations"></div>
+            </div>
           </div>
           <aside class="profile" id="profile" aria-live="polite" aria-label="Persoonsprofiel">
             <div class="profile-topline"><span id="profile-generation"></span><span id="profile-status" class="status"></span></div>

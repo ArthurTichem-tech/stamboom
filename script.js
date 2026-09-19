@@ -25,54 +25,77 @@ const people = [
   { id:'claes-1630', name:'Claes Tijgon / Tichon', dates:'mogelijk ca. 1630', place:'Made', partner:'Onbekend', status:'tentative', note:'Een oudere Claes wordt in genealogische reconstructies als mogelijke vader van Jan Klaesse genoemd. De directe akte die deze vader-zoonverbinding bewijst is nog niet gevonden. Dit profiel is daarom nadrukkelijk een onderzoekshypothese.', sources:['soer'] }
 ];
 
-const list = document.getElementById('person-list');
+const tree = document.getElementById('family-tree');
+const generations = document.getElementById('tree-generations');
+const lines = document.getElementById('tree-links');
 const search = document.getElementById('person-search');
 const clearSearch = document.getElementById('clear-search');
 const noResults = document.getElementById('no-results');
-let selectedId = people[0].id;
-let visiblePeople = people;
+const treePeople = [...people].reverse();
+let selected = { index: treePeople.length - 1, side: 'ancestor' };
 
 function normalized(value) { return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
 function statusLabel(status) { return status === 'tentative' ? 'Nog onzeker' : status === 'family' ? 'Familiegegevens' : 'Gereconstrueerd'; }
+function spouseName(person) {
+  if (person.partner === '—' || person.partner === 'Onbekend') return null;
+  return person.partner.replace(/\s*\(naamspelling te verifiëren\)/, '');
+}
 
-function renderList() {
-  list.replaceChildren();
-  noResults.hidden = visiblePeople.length !== 0;
-  visiblePeople.forEach(person => {
-    const index = people.indexOf(person);
-    const li = document.createElement('li');
-    if (person.status === 'tentative') li.className = 'tentative';
-    const button = document.createElement('button');
-    button.className = 'person-card';
-    button.type = 'button';
-    button.setAttribute('aria-current', person.id === selectedId ? 'true' : 'false');
-    button.setAttribute('aria-label', `Generatie ${index + 1}: ${person.name}, ${person.dates}. Bekijk profiel.`);
-    const number = document.createElement('span'); number.className = 'person-index'; number.textContent = String(index + 1).padStart(2,'0');
-    const summary = document.createElement('span'); summary.className = 'person-summary';
-    const name = document.createElement('strong'); name.textContent = person.name;
-    const meta = document.createElement('small'); meta.textContent = `${person.dates} · ${person.place}`;
-    summary.append(name,meta);
-    const arrow = document.createElement('span'); arrow.className = 'person-arrow'; arrow.setAttribute('aria-hidden','true'); arrow.textContent = '↗';
-    button.append(number,summary,arrow);
-    button.addEventListener('click', () => selectPerson(person.id));
-    li.append(button); list.append(li);
+function makeNode(person, index, side) {
+  const name = side === 'ancestor' ? person.name : spouseName(person);
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = `tree-node ${side}${person.status === 'tentative' && side === 'ancestor' ? ' tentative' : ''}`;
+  button.dataset.index = String(index);
+  button.dataset.side = side;
+  button.dataset.search = normalized(`${name} ${side === 'ancestor' ? person.dates + ' ' + person.place : ''}`);
+  button.setAttribute('aria-label', `${name}, ${side === 'ancestor' ? 'voorouder' : 'partner'} in generatie ${people.length - index}. Bekijk profiel.`);
+  const role = document.createElement('span'); role.className = 'node-role';
+  role.textContent = side === 'ancestor' ? 'TICHEM-LIJN' : 'PARTNER';
+  const title = document.createElement('strong'); title.textContent = name;
+  const detail = document.createElement('small');
+  detail.textContent = side === 'ancestor' ? person.dates : `met ${person.name}`;
+  button.append(role, title, detail);
+  button.addEventListener('click', () => selectNode(index, side));
+  return button;
+}
+
+function renderTree() {
+  generations.replaceChildren();
+  treePeople.forEach((person, index) => {
+    const row = document.createElement('div'); row.className = 'generation';
+    const label = document.createElement('span'); label.className = 'generation-label';
+    label.textContent = `${String(people.length - index).padStart(2,'0')} / ${people.length}`;
+    const couple = document.createElement('div'); couple.className = 'couple';
+    couple.append(makeNode(person, index, 'ancestor'));
+    if (spouseName(person)) couple.append(makeNode(person, index, 'partner'));
+    else couple.classList.add('single');
+    row.append(label, couple);
+    generations.append(row);
   });
+  requestAnimationFrame(drawConnections);
 }
 
 function setText(id, value) { document.getElementById(id).textContent = value; }
 function renderProfile() {
-  const person = people.find(item => item.id === selectedId);
-  if (!person) return;
-  const index = people.indexOf(person);
-  setText('profile-generation', `Generatie ${String(index + 1).padStart(2,'0')} / ${people.length}`);
+  const person = treePeople[selected.index];
+  const partner = selected.side === 'partner';
+  const name = partner ? spouseName(person) : person.name;
+  const statusType = partner && person.partner.includes('naamspelling') ? 'tentative' : person.status;
+  setText('profile-generation', `Generatie ${String(people.length - selected.index).padStart(2,'0')} / ${people.length}`);
   const status = document.getElementById('profile-status');
-  status.textContent = statusLabel(person.status);
-  status.className = `status ${person.status === 'tentative' ? 'tentative' : person.status === 'family' ? 'family' : ''}`;
-  setText('profile-name', person.name);
-  setText('profile-dates', person.dates);
-  setText('profile-story', person.note);
+  status.textContent = statusLabel(statusType);
+  status.className = `status ${statusType === 'tentative' ? 'tentative' : statusType === 'family' ? 'family' : ''}`;
+  setText('profile-name', name);
+  setText('profile-dates', partner ? 'Partner in deze generatie' : person.dates);
+  setText('profile-story', partner
+    ? person.partner.includes('naamspelling')
+      ? 'Deze naam komt uit familiegegevens. De spelling van de achternaam moet nog worden bevestigd.'
+      : `De bronnen bij deze generatie noemen ${name} als partner van ${person.name}. Meer gegevens zijn nog niet uitgewerkt.`
+    : person.note);
   const facts = document.getElementById('profile-facts'); facts.replaceChildren();
-  [['Plaats',person.place],['Partner',person.partner]].filter(([,value]) => value !== '—').forEach(([label,value]) => {
+  const factRows = partner ? [['Tichem-lijn', person.name]] : [['Plaats',person.place],['Partner',person.partner]].filter(([,value]) => value !== '—');
+  factRows.forEach(([label,value]) => {
     const row = document.createElement('div'); const dt = document.createElement('dt'); const dd = document.createElement('dd');
     dt.textContent = label; dd.textContent = value; row.append(dt,dd); facts.append(row);
   });
@@ -83,27 +106,83 @@ function renderProfile() {
     else li.textContent = source.label;
     sourceList.append(li);
   });
-  const position = visiblePeople.findIndex(item => item.id === selectedId);
-  document.getElementById('newer-person').disabled = position <= 0;
-  document.getElementById('older-person').disabled = position < 0 || position === visiblePeople.length - 1;
+  document.getElementById('newer-person').disabled = selected.index === treePeople.length - 1;
+  document.getElementById('older-person').disabled = selected.index === 0;
 }
 
-function selectPerson(id) {
-  selectedId = id;
-  renderList(); renderProfile();
-  if (window.matchMedia('(max-width: 900px)').matches) document.getElementById('profile').scrollIntoView({behavior:'smooth',block:'start'});
+function updateSelection() {
+  generations.querySelectorAll('.tree-node').forEach(node => {
+    node.setAttribute('aria-current', Number(node.dataset.index) === selected.index && node.dataset.side === selected.side ? 'true' : 'false');
+  });
+  renderProfile();
 }
 
-function filterPeople() {
+function selectNode(index, side, scroll = true) {
+  selected = { index, side };
+  updateSelection();
+  if (scroll && window.matchMedia('(max-width: 900px)').matches) {
+    document.getElementById('profile').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function searchTree() {
   const query = normalized(search.value.trim());
-  visiblePeople = query ? people.filter(person => normalized(`${person.name} ${person.place} ${person.dates} ${person.partner}`).includes(query)) : people;
+  const nodes = [...generations.querySelectorAll('.tree-node')];
+  const matches = nodes.filter(node => node.dataset.search.includes(query));
+  nodes.forEach(node => node.classList.toggle('is-dimmed', !!query && !matches.includes(node)));
   clearSearch.hidden = !query;
-  if (visiblePeople.length && !visiblePeople.some(item => item.id === selectedId)) selectedId = visiblePeople[0].id;
-  renderList(); renderProfile();
+  noResults.hidden = !query || matches.length > 0;
+  if (query && matches.length) selectNode(Number(matches[0].dataset.index), matches[0].dataset.side, false);
 }
 
-search.addEventListener('input', filterPeople);
-clearSearch.addEventListener('click', () => { search.value = ''; filterPeople(); search.focus(); });
-document.getElementById('newer-person').addEventListener('click', () => { const position = visiblePeople.findIndex(item => item.id === selectedId); if (position > 0) selectPerson(visiblePeople[position - 1].id); });
-document.getElementById('older-person').addEventListener('click', () => { const position = visiblePeople.findIndex(item => item.id === selectedId); if (position >= 0 && position < visiblePeople.length - 1) selectPerson(visiblePeople[position + 1].id); });
-renderList(); renderProfile();
+function drawConnections() {
+  const bounds = tree.getBoundingClientRect();
+  const width = tree.clientWidth;
+  const height = generations.offsetHeight;
+  lines.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  lines.setAttribute('width', String(width));
+  lines.setAttribute('height', String(height));
+  lines.replaceChildren();
+  const rows = [...generations.querySelectorAll('.generation')];
+  const point = (element, edge) => {
+    const rect = element.getBoundingClientRect();
+    return { x: rect.left - bounds.left + rect.width / 2, y: (edge === 'bottom' ? rect.bottom : rect.top) - bounds.top };
+  };
+  const addPath = (d, uncertain = false) => {
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('class', `tree-link${uncertain ? ' uncertain' : ''}`);
+    lines.append(path);
+  };
+  rows.slice(0, -1).forEach((row, index) => {
+    const ancestor = point(row.querySelector('.tree-node.ancestor'), 'bottom');
+    const spouseElement = row.querySelector('.tree-node.partner');
+    const spouse = spouseElement ? point(spouseElement, 'bottom') : null;
+    const child = point(rows[index + 1].querySelector('.tree-node.ancestor'), 'top');
+    const joinY = Math.max(ancestor.y, spouse?.y ?? ancestor.y) + 22;
+    const joinX = spouse ? (ancestor.x + spouse.x) / 2 : ancestor.x;
+    const middleY = joinY + (child.y - joinY) / 2;
+    const uncertain = treePeople[index].status === 'tentative';
+    addPath(`M ${ancestor.x} ${ancestor.y} V ${joinY}`, uncertain);
+    if (spouse) {
+      addPath(`M ${spouse.x} ${spouse.y} V ${joinY}`, uncertain);
+      addPath(`M ${ancestor.x} ${joinY} H ${spouse.x}`, uncertain);
+    }
+    addPath(`M ${joinX} ${joinY} V ${middleY} H ${child.x} V ${child.y}`, uncertain);
+  });
+}
+
+search.addEventListener('input', searchTree);
+search.addEventListener('keydown', event => {
+  if (event.key === 'Enter' && search.value.trim()) {
+    event.preventDefault();
+    generations.querySelector('.tree-node[aria-current="true"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+});
+clearSearch.addEventListener('click', () => { search.value = ''; searchTree(); search.focus(); });
+document.getElementById('newer-person').addEventListener('click', () => selectNode(selected.index + 1, 'ancestor'));
+document.getElementById('older-person').addEventListener('click', () => selectNode(selected.index - 1, 'ancestor'));
+renderTree();
+updateSelection();
+new ResizeObserver(drawConnections).observe(generations);
+document.fonts?.ready.then(drawConnections);
