@@ -3,106 +3,64 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#183a35" />
-    <meta name="description" content="Een interactief familiearchief van de familie Tichem, van Zeeland terug naar Made." />
-    <title>De Tichem-lijn — Familiearchief</title>
+    <meta name="theme-color" content="#111819" />
+    <meta name="description" content="De interactieve stamboom van de familie Tichem." />
+    <title>Familie Tichem — Stamboom</title>
     <link rel="stylesheet" href="styles.css" />
     <script src="script.js" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#boom">Spring naar de stamboom</a>
-    <header class="site-header">
-      <a class="brand" href="#top" aria-label="De Tichem-lijn, naar boven">
-        <span class="brand-mark" aria-hidden="true">T<span class="brand-dot">.</span></span>
-        <span>Familiearchief <strong>Tichem</strong></span>
+    <header class="site-header" id="top">
+      <a class="brand" href="#top" aria-label="Familie Tichem, naar boven">
+        <strong>Tichem</strong><span>familiearchief</span>
       </a>
       <nav aria-label="Hoofdnavigatie">
         <a href="#boom">Stamboom</a>
-        <a href="#reis">De reis</a>
         <a href="#onderzoek">Onderzoek</a>
       </nav>
     </header>
 
-    <main id="top">
-      <section class="hero" aria-labelledby="hero-title">
-        <div class="hero-grain" aria-hidden="true"></div>
-        <div class="hero-inner">
-          <p class="eyebrow light">EEN FAMILIEGESCHIEDENIS IN ONTWIKKELING</p>
-          <h1 id="hero-title">Sporen van <em>de naam</em> Tichem</h1>
-          <p class="hero-copy">Van de Zeeuwse eilanden terug naar Made. Ontdek de mensen achter de namen, volg hun spoor door de eeuwen en kijk mee met wat nog onderzocht wordt.</p>
-          <a class="hero-link" href="#boom">Verken de stamboom <span aria-hidden="true">↗</span></a>
-          <div class="hero-facts" aria-label="Overzicht">
-            <div><strong>12</strong><span>generaties in beeld</span></div>
-            <div><strong>ca. 1630</strong><span>oudste mogelijke spoor</span></div>
-            <div><strong>6</strong><span>plaatsen in de familieroute</span></div>
-          </div>
-        </div>
-        <div class="hero-decoration" aria-hidden="true"><span>1630</span><i></i><span>2026</span></div>
+    <main>
+      <section class="page-intro wrap" aria-labelledby="page-title">
+        <p class="overline">FAMILIEARCHIEF / TICHEM</p>
+        <h1 id="page-title">De familie <em>Tichem</em></h1>
+        <p>Een interactieve stamboom van nu tot de zeventiende eeuw.</p>
       </section>
 
-      <section class="intro wrap" aria-label="Over dit archief">
-        <p class="eyebrow">HET VERHAAL TOT NU TOE</p>
-        <div class="intro-grid">
-          <h2>Een naam die <em>meereist.</em></h2>
-          <div>
-            <p>In oude stukken verschijnt de familienaam onder meer als <strong>Tichon, Tichum, Tijgon</strong> en uiteindelijk <strong>Tichem</strong>. De gereconstrueerde lijn loopt van Made via Stavenisse en Tholen naar latere generaties.</p>
-            <p>Een stamboom is nooit af. Daarom zie je bij ieder profiel welke gegevens uit bronnen komen, welke uit familieherinneringen en waar een verbinding nog onzeker is.</p>
-          </div>
+      <section class="tree-section wrap" id="boom" aria-labelledby="tree-title">
+        <div class="section-heading">
+          <div><p class="overline">12 GENERATIES</p><h2 id="tree-title">De stamboom</h2></div>
+          <p>Selecteer een persoon om het profiel en de bronnen te bekijken.</p>
         </div>
-      </section>
-
-      <section class="tree-section" id="boom" aria-labelledby="tree-title">
-        <div class="wrap">
-          <div class="section-heading">
-            <div><p class="eyebrow">DE RECHTE TICHEM-LIJN</p><h2 id="tree-title">Ontmoet de voorouders</h2></div>
-            <p>Klik op een naam voor het verhaal, familieverband en de bronnen.</p>
+        <div class="tree-toolbar">
+          <label for="person-search">Zoek</label>
+          <div class="search-box"><span aria-hidden="true">⌕</span><input id="person-search" type="search" placeholder="Naam of plaats" autocomplete="off" /></div>
+          <button type="button" id="clear-search" class="text-button" hidden>Wissen</button>
+        </div>
+        <div class="tree-layout">
+          <div class="tree-column">
+            <ol id="person-list" class="person-list" aria-label="Generaties van jong naar oud"></ol>
+            <p id="no-results" class="no-results" hidden>Geen personen gevonden.</p>
           </div>
-          <div class="tree-toolbar">
-            <label for="person-search">Zoek op naam of plaats</label>
-            <div class="search-box"><span aria-hidden="true">⌕</span><input id="person-search" type="search" placeholder="Bijvoorbeeld Gerard of Stavenisse" autocomplete="off" /></div>
-            <button type="button" id="clear-search" class="text-button" hidden>Wis zoekopdracht</button>
-          </div>
-          <div class="tree-layout">
-            <div class="tree-column">
-              <div class="tree-legend"><span><i class="legend-dot solid"></i> Onderbouwd / familiegegevens</span><span><i class="legend-dot tentative"></i> Nog onzeker</span></div>
-              <ol id="person-list" class="person-list" aria-label="Generaties van jong naar oud"></ol>
-              <p id="no-results" class="no-results" hidden>Geen personen gevonden. Probeer een andere naam of plaats.</p>
-            </div>
-            <aside class="profile" id="profile" aria-live="polite" aria-label="Persoonsprofiel">
-              <div class="profile-topline"><span id="profile-generation"></span><span id="profile-status" class="status"></span></div>
-              <div class="profile-monogram" id="profile-monogram" aria-hidden="true"></div>
-              <p class="eyebrow">PERSOONSPROFIEL</p>
-              <h3 id="profile-name"></h3>
-              <p id="profile-dates" class="profile-dates"></p>
-              <div id="profile-facts" class="profile-facts"></div>
-              <div class="profile-story"><h4>Het verhaal</h4><p id="profile-story"></p></div>
-              <div class="profile-sources"><h4>Herkomst van de gegevens</h4><ul id="profile-source-list"></ul></div>
-              <div class="profile-nav"><button type="button" id="newer-person">← Jonger</button><button type="button" id="older-person">Ouder →</button></div>
-            </aside>
-          </div>
+          <aside class="profile" id="profile" aria-live="polite" aria-label="Persoonsprofiel">
+            <div class="profile-topline"><span id="profile-generation"></span><span id="profile-status" class="status"></span></div>
+            <h3 id="profile-name"></h3>
+            <p id="profile-dates" class="profile-dates"></p>
+            <dl id="profile-facts" class="profile-facts"></dl>
+            <div class="profile-story"><h4>Over deze persoon</h4><p id="profile-story"></p></div>
+            <div class="profile-sources"><h4>Bronnen</h4><ul id="profile-source-list"></ul></div>
+            <div class="profile-nav"><button type="button" id="newer-person">← Jonger</button><button type="button" id="older-person">Ouder →</button></div>
+          </aside>
         </div>
       </section>
 
-      <section class="journey wrap" id="reis" aria-labelledby="journey-title">
-        <div class="section-heading"><div><p class="eyebrow">VAN PLAATS NAAR PLAATS</p><h2 id="journey-title">De route van de familie</h2></div><p>De plaatsen volgen de gereconstrueerde vaderlijn; latere verplaatsingen komen uit familiegegevens.</p></div>
-        <div class="route" aria-label="Familieroute">
-          <div><span>01</span><strong>Made</strong><small>17e eeuw · vroegste spoor</small></div>
-          <div><span>02</span><strong>Stavenisse</strong><small>vanaf 1688</small></div>
-          <div><span>03</span><strong>Poortvliet</strong><small>18e eeuw</small></div>
-          <div><span>04</span><strong>Scherpenisse</strong><small>19e eeuw</small></div>
-          <div><span>05</span><strong>Sint-Philipsland</strong><small>20e eeuw</small></div>
-          <div><span>06</span><strong>Westland & Apeldoorn</strong><small>recente generaties</small></div>
-        </div>
-      </section>
-
-      <section class="research" id="onderzoek" aria-labelledby="research-title">
-        <div class="wrap research-grid">
-          <div><p class="eyebrow light">OPEN VRAGEN</p><h2 id="research-title">Waar het spoor <em>nog open ligt.</em></h2><p>Het mogelijke verband met Claes Tijgon rond 1630 vraagt om een directe akte. Een Hugenotenafkomst is voor deze lijn nog niet aangetoond. Nieuwe bronnen kunnen dit verhaal veranderen.</p></div>
-          <div class="research-card"><span class="research-icon" aria-hidden="true">✳</span><h3>Help het archief groeien</h3><p>Heb je een familieverhaal, foto of akte? Bewaar bij een aanvulling liefst ook de herkomst. Zo wordt elke nieuwe stap controleerbaar.</p><a href="https://github.com/ArthurTichem-tech/stamboom/issues" target="_blank" rel="noopener noreferrer">Deel een aanvulling via GitHub ↗</a></div>
-        </div>
+      <section class="research wrap" id="onderzoek" aria-labelledby="research-title">
+        <div><p class="overline">ONDERZOEK</p><h2 id="research-title">Nog niet bewezen</h2></div>
+        <p>De mogelijke verbinding met Claes Tijgon rond 1630 en een Hugenotenafkomst vragen verder onderzoek. Bij de profielen staan de gebruikte bronnen en onzekerheden.</p>
       </section>
     </main>
 
-    <footer class="site-footer"><div class="wrap"><strong>Familiearchief Tichem</strong><p>Een levend onderzoek. Voor levende personen tonen we bewust geen geboortedata of privégegevens.</p><a href="https://github.com/ArthurTichem-tech/stamboom" target="_blank" rel="noopener noreferrer">Bekijk de broncode ↗</a></div></footer>
+    <footer class="site-footer"><div class="wrap"><span>Familie Tichem</span><p>Voor levende personen tonen we beperkte gegevens.</p><a href="https://github.com/ArthurTichem-tech/stamboom" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></footer>
   </body>
 </html>

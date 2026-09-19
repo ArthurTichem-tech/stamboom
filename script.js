@@ -34,7 +34,6 @@ let visiblePeople = people;
 
 function normalized(value) { return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
 function statusLabel(status) { return status === 'tentative' ? 'Nog onzeker' : status === 'family' ? 'Familiegegevens' : 'Gereconstrueerd'; }
-function initials(name) { return name.replace(/[“”/]/g,' ').split(/\s+/).filter(word => word.length > 1).slice(0,2).map(word => word[0]).join('').toUpperCase(); }
 
 function renderList() {
   list.replaceChildren();
@@ -69,12 +68,11 @@ function renderProfile() {
   const status = document.getElementById('profile-status');
   status.textContent = statusLabel(person.status);
   status.className = `status ${person.status === 'tentative' ? 'tentative' : person.status === 'family' ? 'family' : ''}`;
-  setText('profile-monogram', initials(person.name));
   setText('profile-name', person.name);
   setText('profile-dates', person.dates);
   setText('profile-story', person.note);
   const facts = document.getElementById('profile-facts'); facts.replaceChildren();
-  [['Plaats',person.place],['Partner',person.partner]].forEach(([label,value]) => {
+  [['Plaats',person.place],['Partner',person.partner]].filter(([,value]) => value !== '—').forEach(([label,value]) => {
     const row = document.createElement('div'); const dt = document.createElement('dt'); const dd = document.createElement('dd');
     dt.textContent = label; dd.textContent = value; row.append(dt,dd); facts.append(row);
   });
