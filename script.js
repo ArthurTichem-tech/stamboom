@@ -41,9 +41,19 @@ const clearSearch = document.getElementById('clear-search');
 const noResults = document.getElementById('no-results');
 const treePeople = [...people].reverse();
 let selected = { index: treePeople.length - 1, side: 'ancestor' };
+const livingPeriods = {
+  'arthur-heden': 'jaren 2000',
+  'arthur-vader': 'jaren 1960',
+  'jan-opa': 'jaren 1930'
+};
 
 function normalized(value) { return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
 function statusLabel(status) { return status === 'tentative' ? 'Nog onzeker' : status === 'family' ? 'Familiegegevens' : 'Gereconstrueerd'; }
+function timeLabel(person) {
+  if (livingPeriods[person.id]) return livingPeriods[person.id];
+  const year = person.dates.match(/\d{4}/)?.[0];
+  return year ? `${/ca\.|mogelijk/.test(person.dates) ? 'ca. ' : ''}${year}` : 'datum onbekend';
+}
 function spouseName(person) {
   if (person.partner === '—' || person.partner === 'Onbekend') return null;
   return person.partner.replace(/\s*\(naamspelling te verifiëren\)/, '');
@@ -57,9 +67,9 @@ function makeNode(person, index, side) {
   button.dataset.index = String(index);
   button.dataset.side = side;
   button.dataset.search = normalized(`${name} ${side === 'ancestor' ? person.dates + ' ' + person.place : ''}`);
-  button.setAttribute('aria-label', `${name}, ${side === 'ancestor' ? 'voorouder' : 'partner'} in generatie ${people.length - index}. Bekijk profiel.`);
+  button.setAttribute('aria-label', `${name}, ${side === 'ancestor' ? 'voorouder' : 'partner'}, periode ${timeLabel(person)}. Bekijk profiel.`);
   const role = document.createElement('span'); role.className = 'node-role';
-  role.textContent = side === 'ancestor' ? 'TICHEM-LIJN' : 'PARTNER';
+  role.textContent = side === 'ancestor' ? 'Voorouder' : 'Partner';
   const title = document.createElement('strong'); title.textContent = name;
   const detail = document.createElement('small');
   detail.textContent = side === 'ancestor' ? person.dates : `met ${person.name}`;
@@ -71,9 +81,9 @@ function makeNode(person, index, side) {
 function renderTree() {
   generations.replaceChildren();
   treePeople.forEach((person, index) => {
-    const row = document.createElement('div'); row.className = 'generation';
-    const label = document.createElement('span'); label.className = 'generation-label';
-    label.textContent = `${String(people.length - index).padStart(2,'0')} / ${people.length}`;
+    const row = document.createElement('div'); row.className = `generation${person.status === 'tentative' ? ' tentative' : ''}`;
+    const label = document.createElement('span'); label.className = 'time-label';
+    label.textContent = timeLabel(person);
     const couple = document.createElement('div'); couple.className = 'couple';
     couple.append(makeNode(person, index, 'ancestor'));
     if (spouseName(person)) couple.append(makeNode(person, index, 'partner'));
@@ -90,16 +100,16 @@ function renderProfile() {
   const partner = selected.side === 'partner';
   const name = partner ? spouseName(person) : person.name;
   const statusType = partner && person.partner.includes('naamspelling') ? 'tentative' : person.status;
-  setText('profile-generation', `Generatie ${String(people.length - selected.index).padStart(2,'0')} / ${people.length}`);
+  setText('profile-period', timeLabel(person));
   const status = document.getElementById('profile-status');
   status.textContent = statusLabel(statusType);
   status.className = `status ${statusType === 'tentative' ? 'tentative' : statusType === 'family' ? 'family' : ''}`;
   setText('profile-name', name);
-  setText('profile-dates', partner ? 'Partner in deze generatie' : person.dates);
+  setText('profile-dates', partner ? 'Partner' : person.dates);
   setText('profile-story', partner
     ? person.partner.includes('naamspelling')
       ? 'Deze naam komt uit familiegegevens. De spelling van de achternaam moet nog worden bevestigd.'
-      : `De bronnen bij deze generatie noemen ${name} als partner van ${person.name}. Meer gegevens zijn nog niet uitgewerkt.`
+      : `De bronnen bij deze familietak noemen ${name} als partner van ${person.name}. Meer gegevens zijn nog niet uitgewerkt.`
     : person.note);
   const facts = document.getElementById('profile-facts'); facts.replaceChildren();
   const factRows = partner ? [['Tichem-lijn', person.name]] : [['Plaats',person.place],['Partner',person.partner]].filter(([,value]) => value !== '—');
