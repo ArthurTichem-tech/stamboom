@@ -25,6 +25,14 @@ const people = [
   { id:'claes-1630', name:'Claes Tijgon / Tichon', dates:'mogelijk ca. 1630', place:'Made', partner:'Onbekend', status:'tentative', note:'Een oudere Claes wordt in genealogische reconstructies als mogelijke vader van Jan Klaesse genoemd. De directe akte die deze vader-zoonverbinding bewijst is nog niet gevonden. Dit profiel is daarom nadrukkelijk een onderzoekshypothese.', sources:['soer'] }
 ];
 
+const partnerSources = {
+  'arthur-vader': ['family'], 'jan-opa': ['family'],
+  'cornelis-1897': ['philippus'], 'gerard-1868': ['slager'],
+  'cornelis-1832': ['westplate'], 'cornelis-1800': ['westplate'],
+  'johannis-1769': ['vanes'], 'jacob-1740': ['jacob'],
+  'johannes-1697': ['soer'], 'jan-1660': ['leune', 'soer']
+};
+
 const tree = document.getElementById('family-tree');
 const generations = document.getElementById('tree-generations');
 const lines = document.getElementById('tree-links');
@@ -100,7 +108,7 @@ function renderProfile() {
     dt.textContent = label; dd.textContent = value; row.append(dt,dd); facts.append(row);
   });
   const sourceList = document.getElementById('profile-source-list'); sourceList.replaceChildren();
-  person.sources.forEach(key => {
+  (partner ? partnerSources[person.id] : person.sources).forEach(key => {
     const source = sources[key]; const li = document.createElement('li');
     if (source.url) { const link = document.createElement('a'); link.href = source.url; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = source.label; li.append(link); }
     else li.textContent = source.label;
