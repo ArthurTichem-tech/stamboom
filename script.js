@@ -1,6 +1,7 @@
 const sources = {
   family: { label: 'Familiegegevens, door Arthur Tichem gedeeld', url: null },
   philippus: { label: 'Philippuslandt, overzicht van overleden inwoners en familieverbanden', url: 'https://philippuslandt.nl/wp-content/uploads/2025/01/overleden-inwoners-en-oud-inwoners-en-verwanten-uit-Sint-Philipsland-van-1940-tot-en-met-2024.pdf' },
+  vanzanen: { label: 'Genealogie Van Zanen, gezin van Jacoba Verwijs en Cornelis Tichem', url: 'https://www.genealogieonline.nl/genealogie-van-zanen/I6000000001747644345.php' },
   westplate: { label: 'Genealogie Westplate, Cornelis Tichem (1832–1893)', url: 'https://www.genealogieonline.nl/genealogie-westplate/I1257.php' },
   slager: { label: 'Genealogie Westplate, Neeltje Maria Slager en kinderen', url: 'https://www.genealogieonline.nl/genealogie-westplate/I10293.php' },
   vanes: { label: 'Stamboom Bakker, Pieternella van Es en kinderen', url: 'https://www.genealogieonline.nl/bakker-stamboom/I500156.php' },
@@ -42,18 +43,18 @@ const siblings = {
   ],
   'arthur-vader': [
     { name:'Erwin', relation:'Oudere broer', source:'family' },
-    { name:'Marcel', relation:'Jongere broer', placement:'right', source:'family' }
+    { name:'Marcel', relation:'Jongere broer', source:'family' }
   ],
   'jan-opa': [
     { name:'Gerard Tichem', years:'1920–2010', source:'philippus' },
     { name:'Janna Tichem', years:'1922–2014', source:'philippus' },
     { name:'Neeltje Maria Tichem', years:'1923–2015', source:'philippus' },
-    { name:'Dingeman Tichem', years:'† 2011', source:'philippus' },
-    { name:'Catharia Maria Tichem', years:'† 1993', source:'philippus' },
+    { name:'Dingeman Tichem', years:'ca. 1925–2011', source:'philippus' },
+    { name:'Catharia Maria Tichem', years:'ca. 1928–1993', source:'philippus' },
     { name:'Jacobus Tichem', years:'1928–2013', source:'philippus' },
     { name:'Jannetje Janna Tichem', years:'1932–2024', source:'philippus' },
-    { name:'Marinus Jacobus Tichem', years:'† 1956', source:'philippus' },
-    { name:'Cornelia Jozina Tichem', years:'† 1943', source:'philippus' }
+    { name:'Marinus Jacobus Tichem', years:'1932–1956', source:'vanzanen' },
+    { name:'Cornelia Jozina Tichem', years:'1933–1943', source:'vanzanen' }
   ],
   'cornelis-1897': [
     { name:'Catharina Maria Tichem', years:'1894–1959', source:'slager' },

@@ -8,6 +8,8 @@ De persoonsprofielen en de met naam gevonden broers en zussen staan in `script.j
 
 Genealogische websites zijn gebruikt als wegwijzers. Controleer namen, data en verwantschappen waar mogelijk in originele akten. Verschillende publicaties geven voor Cornelis Tichem rond 1800 een ander geboortejaar.
 
+Bij Dingeman Tichem en Catharia Maria Tichem zijn de geboortejaren benaderingen op basis van hun leeftijd en sterfdatum in de lijst van Philippuslandt. Voor Marinus Jacobus Tichem (1932) en Cornelia Jozina Tichem (1933) zijn de geboortejaren ook genoemd in Genealogie Van Zanen. Voor Cornelis Tichum (overleden 1769) is nog geen betrouwbaar geboorte- of doopjaar gevonden.
+
 Een voorbeeld van een bronconflict: een overleden-inwonerslijst noemt Jacoba Tichem (1901–2001) een dochter van Gerard Tichem en Neeltje Maria Slager, maar [haar huwelijksakte](https://www.openarchieven.nl/zar:75E6DF2D-10C1-49DF-AC81-475FCA0FA9DD) noemt Pieter Tichem en Grietje Jacoba van Geet als ouders. Zij is daarom niet als zus van Cornelis Tichem (1897) opgenomen. De Jacoba Tichem (1900–1967) die wél in de lijst staat, is een andere persoon volgens de gepubliceerde gezinsgegevens; ook die verbinding verdient controle in een originele akte.
 
 ## Publiceren op GitHub Pages
