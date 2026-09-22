@@ -17,7 +17,7 @@ const sources = {
 };
 
 const people = [
-  { id:'arthur-heden', name:'Arthur Tichem', dates:'Levende generatie', place:'Apeldoorn', partner:'—', status:'family', note:'Dit archief begint bij Arthur. Van levende familieleden staan bewust geen geboortedata of privégegevens op deze openbare pagina.', sources:['family'] },
+  { id:'arthur-heden', name:'Arthur Tichem', dates:'Levende generatie', place:'Apeldoorn', partner:'—', status:'family', note:'Dit archief begint bij Arthur. Van levende familieleden staan geen geboortedata, adressen of contactgegevens op deze openbare pagina.', sources:['family'] },
   { id:'arthur-vader', name:'Arthur Tichem', dates:'Levende generatie', place:'Westland · Apeldoorn', partner:'Pia Hardeman', status:'family', note:'Arthur groeide op in het Westland. De gegevens over zijn plaats in de familie komen uit de familie zelf.', sources:['family'] },
   { id:'jan-opa', name:'Jan Tichem', dates:'Levende generatie', place:'Tholen · Westland', partner:'Cor Struijk (naamspelling te verifiëren)', status:'family', note:'Volgens familiegegevens is Jan een zoon van Cornelis “Cees” Tichem en Jacoba Verwijs. Zijn verbinding met de historische lijn is gebaseerd op familieherinnering en verdient nog een direct document.', sources:['family'] },
   { id:'cornelis-1897', name:'Cornelis “Cees” Tichem', dates:'1897–1979', place:'Sint-Philipsland', partner:'Jacoba Verwijs', status:'research', note:'Cornelis, geboren in 1897, was een zoon van Gerard Tichem en Neeltje Maria Slager. Zijn huwelijk met Jacoba Verwijs verbindt de oudere Scherpenisse-tak met Sint-Philipsland.', sources:['philippus','slager'] },
@@ -33,6 +33,17 @@ const people = [
 
 // Alleen met naam genoemde broers en zussen. Dit is geen bewijs dat een gezin compleet is.
 const siblings = {
+  'arthur-heden': [
+    { name:'Arjan', relation:'Oudere broer', source:'family' },
+    { name:'Pia', relation:'Oudere zus', source:'family' },
+    { name:'Corinnne', relation:'Oudere zus', source:'family' },
+    { name:'Emmy', relation:'Oudere zus', source:'family' },
+    { name:'Sanne', relation:'Oudere zus', source:'family' }
+  ],
+  'arthur-vader': [
+    { name:'Erwin', relation:'Oudere broer', source:'family' },
+    { name:'Marcel', relation:'Jongere broer', placement:'right', source:'family' }
+  ],
   'jan-opa': [
     { name:'Gerard Tichem', years:'1920–2010', source:'philippus' },
     { name:'Janna Tichem', years:'1922–2014', source:'philippus' },
@@ -145,16 +156,31 @@ function makeNode(person, index, side) {
   button.className = `tree-node ${side}${person.status === 'tentative' && side === 'ancestor' ? ' tentative' : ''}`;
   button.dataset.index = String(index);
   button.dataset.side = side;
-  button.dataset.search = normalized(`${name} ${side === 'ancestor' ? [person.dates, person.place, ...(siblings[person.id] || []).map(sibling => sibling.name)].join(' ') : ''}`);
+  button.dataset.search = normalized(`${name} ${side === 'ancestor' ? `${person.dates} ${person.place}` : ''}`);
   button.setAttribute('aria-label', `${name}, ${side === 'ancestor' ? 'Tichem-lijn' : 'partner'}, periode ${timeLabel(person)}. Bekijk profiel.`);
   const role = document.createElement('span'); role.className = 'node-role';
   role.textContent = side === 'ancestor' ? 'Tichem-lijn' : 'Partner';
   const title = document.createElement('strong'); title.textContent = name;
   const detail = document.createElement('small');
-  const siblingCount = siblings[person.id]?.length || 0;
-  detail.textContent = side === 'ancestor' ? `${person.dates}${siblingCount ? ` · ${siblingCount} broers/zussen` : ''}` : `met ${person.name}`;
+  detail.textContent = side === 'ancestor' ? person.dates : `met ${person.name}`;
   button.append(role, title, detail);
   button.addEventListener('click', () => selectNode(index, side));
+  return button;
+}
+
+function makeSiblingNode(person, index, sibling, siblingIndex) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'sibling-node';
+  button.dataset.index = String(index);
+  button.dataset.side = 'sibling';
+  button.dataset.siblingIndex = String(siblingIndex);
+  button.dataset.search = normalized(`${sibling.name} ${sibling.years || ''} ${sibling.relation || ''}`);
+  button.setAttribute('aria-label', `${sibling.name}, ${sibling.relation || `broer of zus van ${person.name}`}. Bekijk profiel.`);
+  const name = document.createElement('strong'); name.textContent = sibling.name;
+  const detail = document.createElement('small'); detail.textContent = sibling.relation || sibling.years || '';
+  button.append(name, detail);
+  button.addEventListener('click', () => selectNode(index, 'sibling', true, siblingIndex));
   return button;
 }
 
@@ -164,11 +190,28 @@ function renderTree() {
     const row = document.createElement('div'); row.className = `generation${person.status === 'tentative' ? ' tentative' : ''}`;
     const label = document.createElement('span'); label.className = 'time-label';
     label.textContent = timeLabel(person);
+    const family = document.createElement('div'); family.className = 'family-unit';
+    const known = siblings[person.id] || [];
+    const addSiblingSide = (placement) => {
+      const entries = known.map((sibling, siblingIndex) => ({ sibling, siblingIndex }))
+        .filter(({ sibling }) => (sibling.placement || 'left') === placement);
+      if (!entries.length) return;
+      const side = document.createElement('div'); side.className = `sibling-side ${placement}`;
+      const heading = document.createElement('span'); heading.className = 'sibling-heading';
+      heading.textContent = entries.length === 1
+        ? (entries[0].sibling.relation?.endsWith('broer') ? 'Broer' : entries[0].sibling.relation?.endsWith('zus') ? 'Zus' : 'Broer of zus')
+        : 'Broers en zussen';
+      side.append(heading, ...entries.map(({ sibling, siblingIndex }) => makeSiblingNode(person, index, sibling, siblingIndex)));
+      family.append(side);
+    };
+    addSiblingSide('left');
     const couple = document.createElement('div'); couple.className = 'couple';
     couple.append(makeNode(person, index, 'ancestor'));
     if (spouseName(person)) couple.append(makeNode(person, index, 'partner'));
     else couple.classList.add('single');
-    row.append(label, couple);
+    family.append(couple);
+    addSiblingSide('right');
+    row.append(label, family);
     generations.append(row);
   });
   requestAnimationFrame(drawConnections);
@@ -191,7 +234,9 @@ function renderSiblings(person, partner) {
     return;
   }
   const intro = document.createElement('p');
-  intro.textContent = `${known.length} met naam gevonden. Dit overzicht hoeft niet volledig te zijn.`;
+  intro.textContent = person.status === 'family' && person.id !== 'jan-opa'
+    ? `${known.length} namen uit familiegegevens, in leeftijdsvolgorde.`
+    : `${known.length} met naam gevonden. Dit overzicht hoeft niet volledig te zijn.`;
   if (siblingNotes[person.id]) {
     const caution = document.createElement('p');
     caution.textContent = siblingNotes[person.id];
@@ -203,14 +248,21 @@ function renderSiblings(person, partner) {
     const description = document.createElement('span');
     const name = document.createElement('strong'); name.textContent = sibling.name;
     const detail = document.createElement('small');
-    detail.textContent = `${sibling.years}${sibling.relation ? ` · ${sibling.relation}` : ''}`;
+    detail.textContent = [sibling.years, sibling.relation].filter(Boolean).join(' · ');
     description.append(name, detail);
-    const link = document.createElement('a');
-    link.href = sources[sibling.source].url;
-    link.target = '_blank'; link.rel = 'noopener noreferrer';
-    link.textContent = 'Bron ↗';
-    link.setAttribute('aria-label', `Bron voor ${sibling.name} ${sibling.years}`);
-    item.append(description, link);
+    const source = sources[sibling.source];
+    if (source.url) {
+      const link = document.createElement('a');
+      link.href = source.url;
+      link.target = '_blank'; link.rel = 'noopener noreferrer';
+      link.textContent = 'Bron ↗';
+      link.setAttribute('aria-label', `Bron voor ${sibling.name} ${sibling.years || ''}`.trim());
+      item.append(description, link);
+    } else {
+      const label = document.createElement('small'); label.className = 'family-source';
+      label.textContent = 'Familiegegevens';
+      item.append(description, label);
+    }
     list.append(item);
   });
   container.append(list);
@@ -218,28 +270,37 @@ function renderSiblings(person, partner) {
 function renderProfile() {
   const person = treePeople[selected.index];
   const partner = selected.side === 'partner';
-  const name = partner ? spouseName(person) : person.name;
-  const statusType = partner && person.partner.includes('naamspelling') ? 'tentative' : person.status;
-  setText('profile-period', timeLabel(person));
+  const sibling = selected.side === 'sibling' ? siblings[person.id]?.[selected.siblingIndex] : null;
+  const name = sibling?.name || (partner ? spouseName(person) : person.name);
+  const statusType = sibling ? (sibling.source === 'family' ? 'family' : 'research')
+    : partner && person.partner.includes('naamspelling') ? 'tentative' : person.status;
+  setText('profile-period', sibling?.years || timeLabel(person));
   const status = document.getElementById('profile-status');
   status.textContent = statusLabel(statusType);
   status.className = `status ${statusType === 'tentative' ? 'tentative' : statusType === 'family' ? 'family' : ''}`;
   setText('profile-name', name);
-  setText('profile-dates', partner ? 'Partner' : person.dates);
-  setText('profile-story', partner
-    ? person.partner.includes('naamspelling')
-      ? 'Deze naam komt uit familiegegevens. De spelling van de achternaam moet nog worden bevestigd.'
-      : `De bronnen bij deze familietak noemen ${name} als partner van ${person.name}. Meer gegevens zijn nog niet uitgewerkt.`
-    : person.note);
-  renderSiblings(person, partner);
+  setText('profile-dates', sibling ? (sibling.years || 'Levende generatie') : partner ? 'Partner' : person.dates);
+  const story = sibling
+    ? sibling.source === 'family'
+      ? `${name} is de ${sibling.relation.toLowerCase()} van ${person.name}. Deze informatie is door Arthur Tichem gedeeld.`
+      : `De vermelde bron plaatst ${name} in hetzelfde gezin als ${person.name}. Verdere gegevens zijn hier nog niet uitgewerkt.`
+    : partner
+      ? person.partner.includes('naamspelling')
+        ? 'Deze naam komt uit familiegegevens. De spelling van de achternaam moet nog worden bevestigd.'
+        : `De bronnen bij deze familietak noemen ${name} als partner van ${person.name}. Meer gegevens zijn nog niet uitgewerkt.`
+      : person.note;
+  setText('profile-story', story);
+  renderSiblings(person, partner || !!sibling);
   const facts = document.getElementById('profile-facts'); facts.replaceChildren();
-  const factRows = partner ? [['Tichem-lijn', person.name]] : [['Plaats',person.place],['Partner',person.partner]].filter(([,value]) => value !== '—');
+  const factRows = sibling ? [['Broer/zus van', person.name]]
+    : partner ? [['Tichem-lijn', person.name]]
+      : [['Plaats',person.place],['Partner',person.partner]].filter(([,value]) => value !== '—');
   factRows.forEach(([label,value]) => {
     const row = document.createElement('div'); const dt = document.createElement('dt'); const dd = document.createElement('dd');
     dt.textContent = label; dd.textContent = value; row.append(dt,dd); facts.append(row);
   });
   const sourceList = document.getElementById('profile-source-list'); sourceList.replaceChildren();
-  (partner ? partnerSources[person.id] : person.sources).forEach(key => {
+  (sibling ? [sibling.source] : partner ? partnerSources[person.id] : person.sources).forEach(key => {
     const source = sources[key]; const li = document.createElement('li');
     if (source.url) { const link = document.createElement('a'); link.href = source.url; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = source.label; li.append(link); }
     else li.textContent = source.label;
@@ -250,14 +311,16 @@ function renderProfile() {
 }
 
 function updateSelection() {
-  generations.querySelectorAll('.tree-node').forEach(node => {
-    node.setAttribute('aria-current', Number(node.dataset.index) === selected.index && node.dataset.side === selected.side ? 'true' : 'false');
+  generations.querySelectorAll('.tree-node, .sibling-node').forEach(node => {
+    const current = Number(node.dataset.index) === selected.index && node.dataset.side === selected.side
+      && (selected.side !== 'sibling' || Number(node.dataset.siblingIndex) === selected.siblingIndex);
+    node.setAttribute('aria-current', current ? 'true' : 'false');
   });
   renderProfile();
 }
 
-function selectNode(index, side, scroll = true) {
-  selected = { index, side };
+function selectNode(index, side, scroll = true, siblingIndex = 0) {
+  selected = { index, side, siblingIndex };
   updateSelection();
   if (scroll && window.matchMedia('(max-width: 900px)').matches) {
     document.getElementById('profile').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -266,12 +329,12 @@ function selectNode(index, side, scroll = true) {
 
 function searchTree() {
   const query = normalized(search.value.trim());
-  const nodes = [...generations.querySelectorAll('.tree-node')];
+  const nodes = [...generations.querySelectorAll('.tree-node, .sibling-node')];
   const matches = nodes.filter(node => node.dataset.search.includes(query));
   nodes.forEach(node => node.classList.toggle('is-dimmed', !!query && !matches.includes(node)));
   clearSearch.hidden = !query;
   noResults.hidden = !query || matches.length > 0;
-  if (query && matches.length) selectNode(Number(matches[0].dataset.index), matches[0].dataset.side, false);
+  if (query && matches.length) selectNode(Number(matches[0].dataset.index), matches[0].dataset.side, false, Number(matches[0].dataset.siblingIndex || 0));
 }
 
 function drawConnections() {
@@ -297,10 +360,14 @@ function drawConnections() {
     const ancestor = point(row.querySelector('.tree-node.ancestor'), 'bottom');
     const spouseElement = row.querySelector('.tree-node.partner');
     const spouse = spouseElement ? point(spouseElement, 'bottom') : null;
-    const child = point(rows[index + 1].querySelector('.tree-node.ancestor'), 'top');
+    const nextRow = rows[index + 1];
+    const child = point(nextRow.querySelector('.tree-node.ancestor'), 'top');
     const joinY = Math.max(ancestor.y, spouse?.y ?? ancestor.y) + 22;
     const joinX = spouse ? (ancestor.x + spouse.x) / 2 : ancestor.x;
-    const middleY = joinY + (child.y - joinY) / 2;
+    const rowBottom = row.getBoundingClientRect().bottom - bounds.top;
+    const nextTop = Math.min(child.y, ...[...nextRow.querySelectorAll('.sibling-side')]
+      .map(side => side.getBoundingClientRect().top - bounds.top));
+    const middleY = rowBottom + (nextTop - rowBottom) / 2;
     const uncertain = treePeople[index].status === 'tentative';
     addPath(`M ${ancestor.x} ${ancestor.y} V ${joinY}`, uncertain);
     if (spouse) {
@@ -315,7 +382,7 @@ search.addEventListener('input', searchTree);
 search.addEventListener('keydown', event => {
   if (event.key === 'Enter' && search.value.trim()) {
     event.preventDefault();
-    generations.querySelector('.tree-node[aria-current="true"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    generations.querySelector('.tree-node[aria-current="true"], .sibling-node[aria-current="true"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 });
 clearSearch.addEventListener('click', () => { search.value = ''; searchTree(); search.focus(); });
