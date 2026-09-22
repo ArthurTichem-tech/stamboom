@@ -7,7 +7,13 @@ const sources = {
   jacob: { label: 'Genealogie Post-Oost, afstamming van Johannis Tichem', url: 'https://www.genealogieonline.nl/genealogie-post-oost/I55735.php' },
   stavenisse: { label: 'NGV Zeeland, klapper op doopboek Stavenisse (1616–1810)', url: 'https://www.ngv-afdelingen.nl/zld/wp-content/uploads/2023/04/Stavenisse_Klapper_DB_1616-1810_v001.pdf' },
   soer: { label: 'NGV Rotterdam, Kwartierstaat Sabrina Soer', url: 'https://ngv-rotterdam.nl/wp-content/uploads/2024/04/kwartierstaat-soer.pdf' },
-  leune: { label: 'Kwartierstaat J.M.G. Leune, met archiefverwijzingen bij Jan Klaesse Tichon', url: 'https://www.hanleune.nl/images/Bestanden/Steenbergen/Genealogie%20van%20Steenbergenaren/Kwartierstaat%20van%20J.M.G.%20Leune.pdf' }
+  leune: { label: 'Kwartierstaat J.M.G. Leune, met archiefverwijzingen bij Jan Klaesse Tichon', url: 'https://www.hanleune.nl/images/Bestanden/Steenbergen/Genealogie%20van%20Steenbergenaren/Kwartierstaat%20van%20J.M.G.%20Leune.pdf' },
+  visscher: { label: 'Stamboom Visscher, gezin van Cornelis Tichem en Maria Bal', url: 'https://www.genealogieonline.nl/stamboom-visscher/I3547.php' },
+  debie: { label: 'Stamboom Jacob de Bie, gezin van Johannes Tichon en Lena Casseband', url: 'https://www.genealogieonline.nl/stamboom-jacob-de-bie/I6400.php' },
+  poortvliet: { label: 'NGV Zeeland, reconstructie doopboek Poortvliet', url: 'https://www.ngv-afdelingen.nl/zld/wp-content/uploads/2023/04/Poortvliet_Reconstructie_Doopboek_1640-1810_v005.pdf' },
+  stavenisse2024: { label: 'NGV Zeeland, reconstructie doopboek Stavenisse (2024)', url: 'https://www.ngv-afdelingen.nl/zld/wp-content/uploads/2024/12/Stavenisse_Reconstructie_Doopboek_1616-1830_v008.pdf' },
+  tychon: { label: 'Genealogische reconstructie familie Tichon/Tichem', url: 'https://philippetychon-ovh.fr/full_genealogy/dat0.htm' },
+  kaashoek: { label: 'Stamboom Kaashoek en Van der Kooi, Jacoba Tichem', url: 'https://www.genealogieonline.nl/stamboom-kaashoek-en-van-der-kooi/I5423.php' }
 };
 
 const people = [
@@ -24,6 +30,79 @@ const people = [
   { id:'jan-1660', name:'Jan Klaesse Tichon', dates:'ca. 1660–1730', place:'Made · Stavenisse', partner:'Adriaentje Jans Verbeeke', status:'research', note:'Jan kwam uit Made. Een kwartierstaat vermeldt zijn komst naar Stavenisse in 1688 en verwijst naar verschillende archiefstukken over zijn leven daar. Zijn patroniem Klaesse wijst op een vader met de voornaam Claes.', sources:['leune','soer'] },
   { id:'claes-1630', name:'Claes Tijgon / Tichon', dates:'mogelijk ca. 1630', place:'Made', partner:'Onbekend', status:'tentative', note:'Een oudere Claes wordt in genealogische reconstructies als mogelijke vader van Jan Klaesse genoemd. De directe akte die deze vader-zoonverbinding bewijst is nog niet gevonden. Dit profiel is daarom nadrukkelijk een onderzoekshypothese.', sources:['soer'] }
 ];
+
+// Alleen met naam genoemde broers en zussen. Dit is geen bewijs dat een gezin compleet is.
+const siblings = {
+  'jan-opa': [
+    { name:'Gerard Tichem', years:'1920–2010', source:'philippus' },
+    { name:'Janna Tichem', years:'1922–2014', source:'philippus' },
+    { name:'Neeltje Maria Tichem', years:'1923–2015', source:'philippus' },
+    { name:'Dingeman Tichem', years:'† 2011', source:'philippus' },
+    { name:'Catharia Maria Tichem', years:'† 1993', source:'philippus' },
+    { name:'Jacobus Tichem', years:'1928–2013', source:'philippus' },
+    { name:'Jannetje Janna Tichem', years:'1932–2024', source:'philippus' },
+    { name:'Marinus Jacobus Tichem', years:'† 1956', source:'philippus' },
+    { name:'Cornelia Jozina Tichem', years:'† 1943', source:'philippus' }
+  ],
+  'cornelis-1897': [
+    { name:'Catharina Maria Tichem', years:'1894–1959', source:'slager' },
+    { name:'Maria Francina Tichem', years:'1895', source:'slager' },
+    { name:'Jacoba Tichem', years:'1900–1967', source:'kaashoek' },
+    { name:'Pieternella Tichem', years:'1902', source:'slager' },
+    { name:'Marinus Jacobus Tichem', years:'1905–1982', source:'slager' },
+    { name:'Cornelia Josina Tichem', years:'1907', source:'slager' },
+    { name:'Jacob Marinus Tichem', years:'1910–1940', source:'slager' }
+  ],
+  'gerard-1868': [
+    { name:'Cornelis Tichem', years:'1863–1863', relation:'Halfbroer', source:'westplate' },
+    { name:'Maria Jozina Tichem', years:'1866–1954', source:'westplate' },
+    { name:'Cornelis Tichem', years:'1870–1960', source:'westplate' },
+    { name:'Jozua Tichem', years:'1873–1965', source:'westplate' },
+    { name:'Pieter Tichem', years:'1876–1971', source:'westplate' }
+  ],
+  'cornelis-1832': [
+    { name:'Pieternella Tichem', years:'1828–1862', source:'visscher' },
+    { name:'Johanna Tichem', years:'1836–1901', source:'visscher' }
+  ],
+  'cornelis-1800': [
+    { name:'Jacob Tichem', years:'1797–1861', source:'vanes' },
+    { name:'Aaltje (Alida) Tichem', years:'1799–1855', source:'vanes' },
+    { name:'Jan Tichum', years:'1807–1857', source:'vanes' },
+    { name:'Marinus Tichem', years:'1811–1839', source:'vanes' },
+    { name:'Johannis Tichem', years:'1814–1859', source:'vanes' }
+  ],
+  'johannis-1769': [
+    { name:'Lena Tichum', years:'gedoopt 1761', source:'tychon' },
+    { name:'Maatje Tichum', years:'gedoopt 1763', source:'poortvliet' },
+    { name:'Adriana Tychem', years:'ca. 1766', source:'tychon' },
+    { name:'Cornelis Tichom', years:'gedoopt 1773', source:'tychon' },
+    { name:'Coba Tichum', years:'gedoopt 1776', source:'tychon' },
+    { name:'Sara Tichum', years:'gedoopt 1777', source:'soer' },
+    { name:'Johanna Tichum', years:'1782', source:'poortvliet' }
+  ],
+  'jacob-1740': [
+    { name:'Johannes Tichum', years:'gedoopt 1723', source:'stavenisse2024' },
+    { name:'Cornelis Tichum', years:'† 1769', source:'debie' },
+    { name:'Sara Tijchon', years:'1731–1758', source:'debie' },
+    { name:'Adriana Tiggon', years:'1731', source:'debie' },
+    { name:'Jan Tijchon', years:'gedoopt 1734', source:'stavenisse2024' },
+    { name:'Johannes Tijchon', years:'gedoopt 1736', source:'stavenisse2024' },
+    { name:'Abraham Tijchon', years:'gedoopt 1739', source:'stavenisse2024' },
+    { name:'Commertje Tijchon', years:'1742', source:'debie' },
+    { name:'Commertje Tijchon', years:'1745', source:'debie' }
+  ],
+  'johannes-1697': [
+    { name:'Klaas Tichon', years:'gedoopt 1689', source:'stavenisse2024' },
+    { name:'Klaas Tichon', years:'gedoopt 1690', source:'stavenisse2024' },
+    { name:'Katelijntie Tichon', years:'gedoopt 1693', source:'stavenisse2024' },
+    { name:'Jakob Tichon', years:'gedoopt 1696', source:'stavenisse2024' },
+    { name:'Abraham Tichon', years:'gedoopt 1698', source:'stavenisse2024' }
+  ]
+};
+const siblingNotes = {
+  'jacob-1740': 'De gepubliceerde stamboom noemt twee kinderen met de naam Commertje. Controle van hun afzonderlijke doopakten blijft gewenst.',
+  'johannes-1697': 'Het doopboek noemt tweemaal een Klaas, in 1689 en 1690. Of de eerste jong overleed, is nog niet bevestigd.'
+};
 
 const partnerSources = {
   'arthur-vader': ['family'], 'jan-opa': ['family'],
@@ -66,13 +145,14 @@ function makeNode(person, index, side) {
   button.className = `tree-node ${side}${person.status === 'tentative' && side === 'ancestor' ? ' tentative' : ''}`;
   button.dataset.index = String(index);
   button.dataset.side = side;
-  button.dataset.search = normalized(`${name} ${side === 'ancestor' ? person.dates + ' ' + person.place : ''}`);
-  button.setAttribute('aria-label', `${name}, ${side === 'ancestor' ? 'voorouder' : 'partner'}, periode ${timeLabel(person)}. Bekijk profiel.`);
+  button.dataset.search = normalized(`${name} ${side === 'ancestor' ? [person.dates, person.place, ...(siblings[person.id] || []).map(sibling => sibling.name)].join(' ') : ''}`);
+  button.setAttribute('aria-label', `${name}, ${side === 'ancestor' ? 'Tichem-lijn' : 'partner'}, periode ${timeLabel(person)}. Bekijk profiel.`);
   const role = document.createElement('span'); role.className = 'node-role';
-  role.textContent = side === 'ancestor' ? 'Voorouder' : 'Partner';
+  role.textContent = side === 'ancestor' ? 'Tichem-lijn' : 'Partner';
   const title = document.createElement('strong'); title.textContent = name;
   const detail = document.createElement('small');
-  detail.textContent = side === 'ancestor' ? person.dates : `met ${person.name}`;
+  const siblingCount = siblings[person.id]?.length || 0;
+  detail.textContent = side === 'ancestor' ? `${person.dates}${siblingCount ? ` · ${siblingCount} broers/zussen` : ''}` : `met ${person.name}`;
   button.append(role, title, detail);
   button.addEventListener('click', () => selectNode(index, side));
   return button;
@@ -95,6 +175,46 @@ function renderTree() {
 }
 
 function setText(id, value) { document.getElementById(id).textContent = value; }
+function renderSiblings(person, partner) {
+  const section = document.getElementById('profile-siblings');
+  section.hidden = partner;
+  if (partner) return;
+  const container = document.getElementById('profile-sibling-content');
+  container.replaceChildren();
+  const known = siblings[person.id] || [];
+  if (!known.length) {
+    const note = document.createElement('p');
+    note.textContent = person.status === 'family'
+      ? 'Geen namen bevestigd voor deze openbare pagina.'
+      : 'Nog geen broer of zus met een controleerbare bron gevonden.';
+    container.append(note);
+    return;
+  }
+  const intro = document.createElement('p');
+  intro.textContent = `${known.length} met naam gevonden. Dit overzicht hoeft niet volledig te zijn.`;
+  if (siblingNotes[person.id]) {
+    const caution = document.createElement('p');
+    caution.textContent = siblingNotes[person.id];
+    container.append(intro, caution);
+  } else container.append(intro);
+  const list = document.createElement('ul');
+  known.forEach(sibling => {
+    const item = document.createElement('li');
+    const description = document.createElement('span');
+    const name = document.createElement('strong'); name.textContent = sibling.name;
+    const detail = document.createElement('small');
+    detail.textContent = `${sibling.years}${sibling.relation ? ` · ${sibling.relation}` : ''}`;
+    description.append(name, detail);
+    const link = document.createElement('a');
+    link.href = sources[sibling.source].url;
+    link.target = '_blank'; link.rel = 'noopener noreferrer';
+    link.textContent = 'Bron ↗';
+    link.setAttribute('aria-label', `Bron voor ${sibling.name} ${sibling.years}`);
+    item.append(description, link);
+    list.append(item);
+  });
+  container.append(list);
+}
 function renderProfile() {
   const person = treePeople[selected.index];
   const partner = selected.side === 'partner';
@@ -111,6 +231,7 @@ function renderProfile() {
       ? 'Deze naam komt uit familiegegevens. De spelling van de achternaam moet nog worden bevestigd.'
       : `De bronnen bij deze familietak noemen ${name} als partner van ${person.name}. Meer gegevens zijn nog niet uitgewerkt.`
     : person.note);
+  renderSiblings(person, partner);
   const facts = document.getElementById('profile-facts'); facts.replaceChildren();
   const factRows = partner ? [['Tichem-lijn', person.name]] : [['Plaats',person.place],['Partner',person.partner]].filter(([,value]) => value !== '—');
   factRows.forEach(([label,value]) => {
